@@ -23,8 +23,8 @@ dotnet run
 
 You try sending a request with Postman
 
-- **URL**: /print/from-zpl
-- **Method**: POST
+- **URL**: `/print/from-zpl`
+- **Method**: `POST`
 - **Data params**:
 ```json
 {
