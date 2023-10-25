@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintZPL.Host", "src\PrintZPL.Host\PrintZPL.Host.csproj", "{AA048826-138E-40FF-B935-AE5A95815E27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintZPL.Core", "src\PrintZPL.Core\PrintZPL.Core.csproj", "{27D994E9-ADBE-4C6A-9E12-675DB9E25B4E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA048826-138E-40FF-B935-AE5A95815E27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA048826-138E-40FF-B935-AE5A95815E27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA048826-138E-40FF-B935-AE5A95815E27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA048826-138E-40FF-B935-AE5A95815E27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27D994E9-ADBE-4C6A-9E12-675DB9E25B4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27D994E9-ADBE-4C6A-9E12-675DB9E25B4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27D994E9-ADBE-4C6A-9E12-675DB9E25B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27D994E9-ADBE-4C6A-9E12-675DB9E25B4E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5461E77F-691A-4D64-B7DD-663EA4B29F90}
+	EndGlobalSection
+EndGlobal
