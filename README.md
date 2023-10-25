@@ -2,9 +2,9 @@
 
 ## Usage
 
-Run the console application and send a POST request to the controller endpoint. 
+Run the console application and send a POST request to the controller endpoint using Postman. 
 
-You can use `CURL`
+Or you can just use `CURL`
 
 ```curl
 curl -X POST "http://localhost:9001/print/from-zpl" \
