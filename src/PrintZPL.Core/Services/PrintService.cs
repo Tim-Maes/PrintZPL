@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using PrintZPL.Core.Exceptions;
-using System.Diagnostics;
 using System.Net.Sockets;
-using System.Text.RegularExpressions;
 
 namespace PrintZPL.Core.Services;
 
@@ -23,9 +20,6 @@ public sealed class PrintService : IPrintService
         if (string.IsNullOrEmpty(zplString))
             throw new ArgumentNullException(nameof(zplString));
 
-        if (!await IsKnownIPAddress(printerIpAddress))
-            throw new PrinterNotFoundException(printerIpAddress);
-
         try
         {
             using (TcpClient client = new TcpClient(printerIpAddress, port))
@@ -42,29 +36,6 @@ public sealed class PrintService : IPrintService
         {
             _logger.LogError($"{ex.Message}");
         }
-    }
-
-    public async Task<bool> IsKnownIPAddress(string ipAddress)
-    {
-        Process process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "powershell.exe",
-                Arguments = "arp -a",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            }
-        };
-
-        process.Start();
-
-        string output = await process.StandardOutput.ReadToEndAsync();
-        process.WaitForExit();
-
-        var regex = new Regex(ipAddress);
-        return regex.IsMatch(output);
     }
 }
 
