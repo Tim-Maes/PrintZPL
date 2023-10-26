@@ -1,7 +1,7 @@
 # PrintZPL
 
 ## Description
-This service allows you to print ZPL labels to a Zebra printer by sending HTTP POST requests.
+This service allows you to send ZPL templates to a Zebra printer by using HTTP POST requests.
 
 ## Installation
 ### Prerequisites
