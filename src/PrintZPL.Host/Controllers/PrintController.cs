@@ -49,6 +49,5 @@ public sealed class PrintFromZPLRequest
     [Required]
     public string IpAddress { get; set; } = "";
 
-    [Required]
-    public int Port { get; set; } = 0;
+    public int Port { get; set; } = 6101; // Default port
 }
