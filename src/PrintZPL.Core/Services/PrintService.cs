@@ -20,7 +20,7 @@ public sealed class PrintService : IPrintService
     {
         _logger.LogInformation($"Printing ZPL template");
 
-        if (zplString is null)
+        if (string.IsNullOrEmpty(zplString))
             throw new ArgumentNullException(nameof(zplString));
 
         if (!await IsKnownIPAddress(printerIpAddress))
@@ -38,13 +38,9 @@ public sealed class PrintService : IPrintService
 
             _logger.LogInformation("ZPL sent to printer successfully!");
         }
-        catch (SocketException ex)
+        catch (Exception ex)
         {
-            _logger.LogError($"Socket Exception: {ex.Message}");
-        }
-        catch (IOException ex)
-        {
-            _logger.LogError($"IO Exception: {ex.Message}");
+            _logger.LogError($"{ex.Message}");
         }
     }
 

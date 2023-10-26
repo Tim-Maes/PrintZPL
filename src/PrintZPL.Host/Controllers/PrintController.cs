@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PrintZPL.Core.Services;
-using System.ComponentModel.DataAnnotations;
+using PrintZPL.Host.Requests;
 
 namespace PrintZPL.Host.Controllers;
 
@@ -39,15 +39,4 @@ public class PrintController : ControllerBase
             return StatusCode(500, "Internal Server Error");
         }
     }
-}
-
-public sealed class PrintFromZPLRequest
-{
-    [Required]
-    public string ZPL { get; set; } = "";
-
-    [Required]
-    public string IpAddress { get; set; } = "";
-
-    public int Port { get; set; } = 6101; // Default port
 }
