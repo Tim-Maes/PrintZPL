@@ -4,9 +4,6 @@
 This service allows you to send ZPL templates to a Zebra printer by using HTTP POST requests.
 
 ## Installation
-### Prerequisites
-- .NET 6 SDK
-
 ### Pack as executable
 
 Run this command in the project folder
@@ -33,6 +30,8 @@ You'll find the output .exe in `bin\Release\net6.0\win-x64\publish`
 
 ### Building the project
 
+### Prerequisites
+- .NET 6 SDK
 ```bash
 dotnet build
 ```
