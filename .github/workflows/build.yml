@@ -41,5 +41,5 @@ jobs:
     - name: Upload macOS Executable
       uses: actions/upload-artifact@v2
       with:
-        name: PrintZPl-osx-x64
+        name: PrintZPL-osx-x64
         path: src/PrintZPL.Host/bin/Release/net6.0/osx-x64/publish/
