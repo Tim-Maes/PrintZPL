@@ -1,0 +1,45 @@
+name: Build and Publish Executable
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0'
+
+    - name: Publish Windows Executable
+      run: dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true --self-contained true
+
+    - name: Publish Linux Executable
+      run: dotnet publish -r linux-x64 -c Release /p:PublishSingleFile=true --self-contained true
+
+    - name: Publish macOS Executable
+      run: dotnet publish -r osx-x64 -c Release /p:PublishSingleFile=true --self-contained true
+
+    - name: Upload Windows Executable
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-exe
+        path: PrintZPL/bin/Release/net6.0/win-x64/publish/
+
+    - name: Upload Linux Executable
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux-exe
+        path: PrintZPL/bin/Release/net6.0/linux-x64/publish/
+    
+    - name: Upload macOS Executable
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos-exe
+        path: PrintZPL/bin/Release/net6.0/osx-x64/publish/
