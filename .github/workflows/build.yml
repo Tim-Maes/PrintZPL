@@ -29,17 +29,17 @@ jobs:
     - name: Upload Windows Executable
       uses: actions/upload-artifact@v2
       with:
-        name: windows-exe
+        name: PrintZPL-win-x64
         path: src/PrintZPL.Host/bin/Release/net6.0/win-x64/publish/
 
     - name: Upload Linux Executable
       uses: actions/upload-artifact@v2
       with:
-        name: linux-exe
+        name: PrintZPL-linux-64
         path: src/PrintZPL.Host/bin/Release/net6.0/linux-x64/publish/
     
     - name: Upload macOS Executable
       uses: actions/upload-artifact@v2
       with:
-        name: macos-exe
+        name: PrintZPl-osx-x64
         path: src/PrintZPL.Host/bin/Release/net6.0/osx-x64/publish/
