@@ -57,6 +57,38 @@ For example, if you use the `$` delimiter in your ZPL template, you can send the
 
 `$Greeting]$` and `$Name$` will be replaced by `Hello` and `World` respectively.
 
+### Print ZPL Labels in batch
+
+You can send a batch of ZPL templates to a printer by using the following request:
+
+```json
+{
+    "PrintRequests":
+    [
+        {
+            "ZPL": "^XA^FO50,50^ADN,36,20^FDHello, $Name$!^FS^XZ",
+            "IpAddress": "0.0.0.0.0",
+            "Port": "6101",
+            "Data": {
+                "Name": "World",
+                "Name2": "OtherValue"
+            },
+            "Delimiter": "$"
+        },
+        {
+            "ZPL": "^XA^FO50,50^ADN,36,20^FDHello, $Name$!^FS^XZ",
+            "IpAddress": "0.0.0.0.0",
+            "Port": "6101",
+            "Data": {
+                "Name": "World",
+                "Name2": "OtherValue"
+            },
+            "Delimiter": "$"
+        }
+    ]
+}
+```
+
 
 ## Installation
 
