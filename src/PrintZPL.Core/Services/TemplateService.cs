@@ -5,19 +5,21 @@ namespace PrintZPL.Core.Services;
 
 public sealed class TemplateService : ITemplateService
 {
-    public string PopulateZplTemplate(object dataModel, string zplTemplate, string delimiter)
+    public string PopulateZplTemplate(Dictionary<string, string> data, string zplTemplate, string delimiter)
     {
         string zpl = zplTemplate;
-        Type modelType = dataModel.GetType();
 
-        foreach (PropertyInfo prop in modelType.GetProperties())
+        if (data.Any())
         {
-            string propName = prop.Name;
-            object propValue = prop.GetValue(dataModel);
+            foreach (var item in data)
+            {
+                string propName = item.Key;
+                string propValue = item.Value;
 
-            string placeholder = Regex.Escape(delimiter) + propName + Regex.Escape(delimiter);
+                string placeholder = Regex.Escape(delimiter) + propName + Regex.Escape(delimiter);
 
-            zpl = Regex.Replace(zpl, placeholder, propValue?.ToString() ?? "", RegexOptions.IgnoreCase);
+                zpl = Regex.Replace(zpl, placeholder, propValue ?? "", RegexOptions.IgnoreCase);
+            }
         }
 
         return zpl;
@@ -26,5 +28,5 @@ public sealed class TemplateService : ITemplateService
 
 public interface ITemplateService
 {
-    string PopulateZplTemplate(object dataModel, string zplTemplate, string delimiter);
+    string PopulateZplTemplate(Dictionary<string, string> data, string zplTemplate, string delimiter);
 }

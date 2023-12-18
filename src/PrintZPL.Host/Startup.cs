@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PrintZPL.Core;
 
 namespace PrintZPL.Host;
 
@@ -8,6 +9,7 @@ internal class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddCore();
         services.AddRouting();
         services.AddControllers();
     }

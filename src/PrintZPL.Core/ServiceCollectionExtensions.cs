@@ -9,6 +9,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddCore(this IServiceCollection services)
     {
         services.TryAddScoped<IPrintService, PrintService>();
+        services.TryAddScoped<ITemplateService, TemplateService>();
 
         return services;
     }

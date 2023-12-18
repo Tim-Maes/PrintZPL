@@ -22,14 +22,16 @@ public class PrintController : ControllerBase
 
     [HttpPost]
     [Route("from-zpl")]
-    public async Task<IActionResult> PrintZPL([FromForm] PrintFromZPLRequest request)
+    public async Task<IActionResult> PrintZPL([FromBody] PrintFromZPLRequest request)
     {
         try
         {
             await _printerService.PrintZPL(
                 zplString: request.ZPL,
                 printerIpAddress: request.IpAddress,
-                port: request.Port);
+                port: request.Port,
+                data: request.Data,
+                delimiter: request.Delimiter);
 
             return Ok();
         }

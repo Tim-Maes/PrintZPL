@@ -11,4 +11,8 @@ public sealed class PrintFromZPLRequest
     public string IpAddress { get; set; }
 
     public int Port { get; set; } = 6101; // Default port
+
+    public Dictionary<string, string>? Data { get; set; }
+
+    public string Delimiter { get; set; }
 }
