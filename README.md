@@ -3,22 +3,17 @@
 ## Description
 This service allows you to send ZPL templates to a Zebra printer by using HTTP POST requests.
 
-## API
+## Installation
 
-### Building the project
+### Download and run as service
 
-### Prerequisites
-- .NET 6 SDK
-```bash
-dotnet build
-```
+[PrintZPL-win-x64]() for Windows
+[PrintZPL-linux-x64]() for Linux
+[PrintZPL-osx-x65]() for MaxOS
 
-### Running the project
-```bash
-dotnet run
-```
+You'll find the output .exe in `bin\Release\net6.0\win-x64\publish`
 
-This will start a web server on port 9001.
+## The API
 
 You try sending a request to `http://localhost:9001/print/from-zpl`
 
@@ -59,6 +54,8 @@ For example, if you use the `$` delimiter in your ZPL template, you can send the
 
 ### Print ZPL Labels in batch
 
+
+Url: `http://localhost:9001/batch-print/from-zpl`
 You can send a batch of ZPL templates to a printer by using the following request:
 
 ```json
@@ -89,10 +86,24 @@ You can send a batch of ZPL templates to a printer by using the following reques
 }
 ```
 
+## The code
 
-## Installation
+### Building the project
 
-### Pack as executable
+### Prerequisites
+- .NET 6 SDK
+```bash
+dotnet build
+```
+
+### Running the project
+```bash
+dotnet run
+```
+
+This will start a web server on port 9001.
+
+### Pack this repo code as executable
 
 Run this command in the project folder
 
@@ -115,3 +126,5 @@ dotnet publish -r osx-x64 -c Release /p:PublishSingleFile=true --self-contained 
 ```
 
 You'll find the output .exe in `bin\Release\net6.0\win-x64\publish`
+
+
