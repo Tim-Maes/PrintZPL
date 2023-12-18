@@ -33,7 +33,6 @@ Using these parameters you can send a ZPL template to a printer:
     "ZPL": "^XA^FO50,50^ADN,36,20^FDHello, world!!^FS^XZ",
     "IpAddress": "0.0.0.0.0",
     "Port": "6101"
-
 }
 ```
 
