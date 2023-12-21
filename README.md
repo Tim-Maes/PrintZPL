@@ -11,8 +11,6 @@ This service allows you to send ZPL templates to a Zebra printer by using HTTP P
 - [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113116) for Linux
 - [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113117) for MaxOS
 
-You'll find the output .exe in `bin\Release\net6.0\win-x64\publish`
-
 ## The API
 
 You try sending a request to `http://localhost:9001/print/from-zpl`
