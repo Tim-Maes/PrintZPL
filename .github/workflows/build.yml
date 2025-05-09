@@ -25,44 +25,43 @@ jobs:
           - osx-x64
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '6.0.x'
+      - name: Setup .NET 6 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
 
-    - name: Cache NuGet packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
 
-    - name: Restore dependencies
-      run: dotnet restore ${{ env.PROJECT_PATH }}
+      - name: Restore dependencies
+        run: dotnet restore "${{ env.PROJECT_PATH }}"
 
-    - name: Publish single-file executable (${{ matrix.runtime }})
-      run: |
-        dotnet publish ${{ env.PROJECT_PATH }} \
-          -c ${{ env.CONFIGURATION }} \
-          -r ${{ matrix.runtime }} \
-          --self-contained true \
-          /p:PublishSingleFile=true \
-          /p:PublishTrimmed=true \
-          /p:TrimMode=Link
+      - name: Publish single-file executable (${{ matrix.runtime }})
+        run: |
+          dotnet publish "${{ env.PROJECT_PATH }}" \
+            -c ${{ env.CONFIGURATION }} \
+            -r ${{ matrix.runtime }} \
+            --self-contained true \
+            /p:PublishSingleFile=true \
+            /p:PublishTrimmed=true \
+            /p:TrimMode=Link
 
-    - name: Zip published output (${{ matrix.runtime }})
-      run: |
-        RUNTIME_DIR=src/PrintZPL.Host/bin/${{ env.CONFIGURATION }}/${{ env.FRAMEWORK }}/${{ matrix.runtime }}/publish
-        ZIP_NAME=PrintZPL-${{ matrix.runtime }}.zip
-        cd $RUNTIME_DIR
-        zip -r ${{ github.workspace }}/$ZIP_NAME .
+      - name: Zip published output (${{ matrix.runtime }})
+        run: |
+          PUBLISH_DIR="src/PrintZPL.Host/bin/${{ env.CONFIGURATION }}/${{ env.FRAMEWORK }}/${{ matrix.runtime }}/publish"
+          ZIP_NAME="PrintZPL-${{ matrix.runtime }}.zip"
+          cd "$PUBLISH_DIR"
+          zip -r "${{ github.workspace }}/$ZIP_NAME" .
 
-    - name: Upload artifact for ${{ matrix.runtime }}
-      uses: actions/upload-artifact@v2
-      with:
-        name: PrintZPL-${{ matrix.runtime }}
-        path: PrintZPL-${{ matrix.runtime }}.zip
+      - name: Upload artifact for ${{ matrix.runtime }}
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: PrintZPL-${{ matrix.runtime }}
+          path: PrintZPL-${{ matrix.runtime }}.zip
