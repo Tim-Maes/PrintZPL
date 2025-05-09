@@ -8,7 +8,7 @@ PrintZPL is a lightweight web service to discover Zebra printers via mDNS and se
 ### Pre-reqs
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- 
+
 ### Download and run as service
 
 - [PrintZPL-win-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/14935544402/artifacts/3096169978) for Windows
