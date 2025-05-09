@@ -1,15 +1,19 @@
 # PrintZPL
 
 ## Description
-This service allows you to discover Zebra printers and send/print ZPL templates by using HTTP POST requests.
+PrintZPL is a lightweight web service to discover Zebra printers via mDNS and send ZPL templates over TCP using simple HTTP calls.
 
 ## Installation
 
+### Pre-reqs
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- 
 ### Download and run as service
 
 - [PrintZPL-win-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/14935544402/artifacts/3096169978) for Windows
 - [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/14935544402/artifacts/3096169686) for Linux
-- [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/14935544402/artifacts/3096170002) for MaxOS
+- [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/14935544402/artifacts/3096170002) for macOS
 
 ## The API
 
