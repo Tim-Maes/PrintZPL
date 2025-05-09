@@ -44,7 +44,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.PROJECT_PATH }}
 
-    - name: Publish single-file executable (${ { matrix.runtime } })
+    - name: Publish single-file executable (${{ matrix.runtime }})
       run: |
         dotnet publish ${{ env.PROJECT_PATH }} \
           -c ${{ env.CONFIGURATION }} \
@@ -54,7 +54,7 @@ jobs:
           /p:PublishTrimmed=true \
           /p:TrimMode=Link
 
-    - name: Zip published output (${ { matrix.runtime } })
+    - name: Zip published output (${{ matrix.runtime }})
       run: |
         RUNTIME_DIR=src/PrintZPL.Host/bin/${{ env.CONFIGURATION }}/${{ env.FRAMEWORK }}/${{ matrix.runtime }}/publish
         ZIP_NAME=PrintZPL-${{ matrix.runtime }}.zip
@@ -62,7 +62,7 @@ jobs:
         zip -r ${{ github.workspace }}/$ZIP_NAME .
 
     - name: Upload artifact for ${{ matrix.runtime }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: PrintZPL-${{ matrix.runtime }}
         path: PrintZPL-${{ matrix.runtime }}.zip
