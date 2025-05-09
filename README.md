@@ -1,7 +1,7 @@
 # PrintZPL
 
 ## Description
-This service allows you to send ZPL templates to a Zebra printer by using HTTP POST requests.
+This service allows you to discover Zebra printers and send/print ZPL templates by using HTTP POST requests.
 
 ## Installation
 
@@ -13,11 +13,25 @@ This service allows you to send ZPL templates to a Zebra printer by using HTTP P
 
 ## The API
 
+### Discovering printers
+
+You can send a GET request to `http//localhost:9001/printers`
+Example response:
+
+```json
+[
+    {
+        "name": "TestPrinter",
+        "ipAddress": "192.168.1.30",
+        "port": 9100,
+        "model": "ZebraTest"
+    }
+]
+```
+
+### Print ZPL Labels
+
 You try sending a request to `http://localhost:9001/print/from-zpl`
-
-For installation as a executable application, see instructions below.
-
-### Print ZPL Label
 
 Using these parameters you can send a ZPL template to a printer:
 
@@ -51,7 +65,6 @@ For example, if you use the `$` delimiter in your ZPL template, you can send the
 `$Greeting]$` and `$Name$` will be replaced by `Hello` and `World` respectively.
 
 ### Print ZPL Labels in batch
-
 
 Url: `http://localhost:9001/batch-print/from-zpl`
 You can send a batch of ZPL templates to a printer by using the following request:

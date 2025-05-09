@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<IPrintService, PrintService>();
         services.TryAddScoped<ITemplateService, TemplateService>();
 
+        services.AddSingleton<IPrinterDiscoveryService, MdnsPrinterDiscoveryService>();
         return services;
     }
 }
