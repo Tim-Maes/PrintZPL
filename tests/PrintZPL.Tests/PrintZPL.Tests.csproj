@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PrintZPL.Core\PrintZPL.Core.csproj" />
+    <ProjectReference Include="..\..\src\PrintZPL.Host\PrintZPL.Host.csproj" />
   </ItemGroup>
 
 </Project>
