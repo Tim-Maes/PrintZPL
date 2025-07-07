@@ -26,6 +26,8 @@ public class PrintController : ControllerBase
     {
         try
         {
+            _logger.LogInformation("Received print request for {IpAddress}:{Port}", request.IpAddress, request.Port);
+            
             await _printerService.PrintZPL(
                 zplString: request.ZPL,
                 printerIpAddress: request.IpAddress,
@@ -33,12 +35,22 @@ public class PrintController : ControllerBase
                 data: request.Data,
                 delimiter: request.Delimiter);
 
-            return Ok();
+            return Ok(new { success = true, message = "ZPL sent to printer successfully" });
+        }
+        catch (ArgumentNullException ex)
+        {
+            _logger.LogWarning("Invalid request: {Message}", ex.Message);
+            return BadRequest(new { success = false, message = "Invalid ZPL data provided" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Printer connection failed: {Message}", ex.Message);
+            return StatusCode(502, new { success = false, message = "Failed to connect to printer", details = ex.Message });
         }
         catch (Exception ex)
         {
-            _logger.LogError($"An error occurred while printing ZPL: {ex.Message}");
-            return StatusCode(500, "Internal Server Error");
+            _logger.LogError(ex, "Unexpected error occurred while printing ZPL: {Message}", ex.Message);
+            return StatusCode(500, new { success = false, message = "Internal server error", details = ex.Message });
         }
     }
 }

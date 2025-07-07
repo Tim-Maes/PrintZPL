@@ -11,14 +11,18 @@ class Program
 {
     public static void Main(string[] args)
     {
-        bool isService = !(Debugger.IsAttached || args.Contains("--console"));
+        // Only try to run as Windows service on Windows platform
+        bool isService = OperatingSystem.IsWindows() && 
+                        !(Debugger.IsAttached || args.Contains("--console"));
 
         if (isService)
         {
-            var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
+            var pathToExe = Process.GetCurrentProcess().MainModule?.FileName;
             var pathToContentRoot = Path.GetDirectoryName(pathToExe);
-            Directory.SetCurrentDirectory(pathToContentRoot);
-
+            if (pathToContentRoot != null)
+            {
+                Directory.SetCurrentDirectory(pathToContentRoot);
+            }
         }
 
         IWebHost host = CreateWebHostBuilder(args.Where(arg => arg != "--console").ToArray(), isService).Build();
@@ -51,15 +55,17 @@ class Program
                          .AddFilter("System", LogLevel.Warning)
                          .AddConsole();
 
-                     if (isService)
+                     if (isService && OperatingSystem.IsWindows())
+                     {
                          logging.AddEventLog(settings =>
                          {
                              settings.SourceName = "PrintZPL";
                          });
+                     }
                  })
              .UseStartup<Startup>()
                 .UseUrls(configuration.GetValue<string>("Host:Urls"))
                 .UseKestrel()
-                .UseConfiguration(configuration); ;
+                .UseConfiguration(configuration);
     }
 }
