@@ -1,21 +1,103 @@
-name: Build & Publish Executables
+name: Build, Test & Publish
 
 on:
   push:
     branches:
       - master
+      - main
     tags:
       - 'v*.*.*'
+  pull_request:
+    branches:
+      - master
+      - main
   workflow_dispatch:
 
 env:
   CONFIGURATION: Release
   PROJECT_PATH: src/PrintZPL.Host/PrintZPL.Host.csproj
+  TEST_PROJECT_PATH: tests/PrintZPL.Tests/PrintZPL.Tests.csproj
   FRAMEWORK: net8.0
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test & Code Quality
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+
+      - name: Run tests
+        run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            **/TestResults/**/*.xml
+            **/TestResults/**/*.trx
+            **/TestResults/**/*.coverage
+
+      - name: Generate code coverage report
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:"coverage" -reporttypes:Html
+        if: always()
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+
+  security:
+    runs-on: ubuntu-latest
+    name: Security & Vulnerability Check
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Check for vulnerable packages
+        run: dotnet list package --vulnerable --include-transitive
+
+      - name: Check for deprecated packages
+        run: dotnet list package --deprecated
+
   publish:
     runs-on: ubuntu-latest
+    needs: [test, security]
+    if: success()
     strategy:
       fail-fast: false
       matrix:
@@ -26,9 +108,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup .NET 6 SDK
+      - name: Setup .NET 8 SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
@@ -51,7 +133,18 @@ jobs:
             --self-contained true \
             /p:PublishSingleFile=true \
             /p:PublishTrimmed=true \
-            /p:TrimMode=Link
+            /p:TrimMode=Link \
+            /p:EnableCompressionInSingleFile=true
+
+      - name: Test published executable (${{ matrix.runtime }})
+        run: |
+          PUBLISH_DIR="src/PrintZPL.Host/bin/${{ env.CONFIGURATION }}/${{ env.FRAMEWORK }}/${{ matrix.runtime }}/publish"
+          if [[ "${{ matrix.runtime }}" == "win-x64" ]]; then
+            echo "Skipping Windows executable test on Linux runner"
+          else
+            chmod +x "$PUBLISH_DIR/PrintZPL.Host"
+            timeout 10s "$PUBLISH_DIR/PrintZPL.Host" --console || true
+          fi
 
       - name: Zip published output (${{ matrix.runtime }})
         run: |
@@ -65,3 +158,26 @@ jobs:
         with:
           name: PrintZPL-${{ matrix.runtime }}
           path: PrintZPL-${{ matrix.runtime }}.zip
+
+  release:
+    runs-on: ubuntu-latest
+    needs: publish
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: PrintZPL-*
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            PrintZPL-*.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
