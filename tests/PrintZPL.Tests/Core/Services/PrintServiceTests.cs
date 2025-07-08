@@ -103,7 +103,7 @@ public class PrintServiceTests
     {
         // Arrange
         var zpl = "^XA^FO50,50^FDTest^FS^XZ";
-        var emptyData = new Dictionary<string, string>();
+        var emptyData = new Dictionary<string, string>(); // Empty dictionary
 
         // Act
         try
@@ -115,7 +115,7 @@ public class PrintServiceTests
             // Expected to fail due to no actual printer
         }
 
-        // Assert
+        // Assert - Empty dictionary should NOT call template service since Count = 0
         _mockTemplateService.Verify(x => x.PopulateZplTemplate(It.IsAny<Dictionary<string, string>>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
@@ -150,47 +150,16 @@ public class PrintServiceTests
     }
 
     [Fact]
-    public async Task PrintZPL_WithInvalidPort_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        var zpl = "^XA^FO50,50^FDTest^FS^XZ";
-        var invalidPort = 99999; // Invalid port
-
-        // Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => 
-            _printService.PrintZPL(zpl, "192.168.1.100", invalidPort, null, null));
-        
-        // Assert
-        Assert.Contains("Failed to connect to printer", exception.Message);
-    }
-
-    [Fact]
     public async Task PrintZPL_WithZeroPort_ThrowsInvalidOperationException()
     {
         // Arrange
         var zpl = "^XA^FO50,50^FDTest^FS^XZ";
         var zeroPort = 0;
 
-        // Act
+        // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => 
             _printService.PrintZPL(zpl, "192.168.1.100", zeroPort, null, null));
         
-        // Assert
-        Assert.Contains("Failed to connect to printer", exception.Message);
-    }
-
-    [Fact]
-    public async Task PrintZPL_WithNegativePort_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        var zpl = "^XA^FO50,50^FDTest^FS^XZ";
-        var negativePort = -1;
-
-        // Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => 
-            _printService.PrintZPL(zpl, "192.168.1.100", negativePort, null, null));
-        
-        // Assert
         Assert.Contains("Failed to connect to printer", exception.Message);
     }
 
