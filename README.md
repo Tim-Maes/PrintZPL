@@ -67,7 +67,9 @@ For example, if you use the `$` delimiter in your ZPL template, you can send the
 ### Print ZPL Labels in batch
 
 Url: `http://localhost:9001/batch-print/from-zpl`
+
 You can send a batch of ZPL templates to a printer by using the following request:
+
 ```json
 {
     "PrintRequests":
