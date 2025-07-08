@@ -8,9 +8,9 @@ This service allows you to discover Zebra printers and send/print ZPL templates 
 
 ### Download and run as service
 
-- [PrintZPL-win-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113118) for Windows
-- [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113116) for Linux
-- [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113117) for MaxOS
+- [PrintZPL-win-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/16136982808/artifacts/3483652427) for Windows
+- [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/16136982808/artifacts/3483652362) for Linux
+- [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/16136982808/artifacts/3483652701) for MaxOS
 
 ## The API
 
