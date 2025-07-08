@@ -70,7 +70,6 @@ public class PrintServiceTests
         }
         catch (Exception)
         {
-            // Expected to fail due to no actual printer
         }
 
         // Assert
@@ -91,7 +90,6 @@ public class PrintServiceTests
         }
         catch (Exception)
         {
-            // Expected to fail due to no actual printer
         }
 
         // Assert
@@ -112,10 +110,8 @@ public class PrintServiceTests
         }
         catch (Exception)
         {
-            // Expected to fail due to no actual printer
         }
 
-        // Assert - Empty dictionary should NOT call template service since Count = 0
         _mockTemplateService.Verify(x => x.PopulateZplTemplate(It.IsAny<Dictionary<string, string>>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
