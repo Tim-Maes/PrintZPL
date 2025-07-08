@@ -12,7 +12,7 @@ This service allows you to discover Zebra printers and send/print ZPL templates 
 - [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/16136982808/artifacts/3483652362) for Linux
 - [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/16136982808/artifacts/3483652701) for MaxOS
 
-- ### Running as a Service
+### Running as a Service
 
 1. Create the service:
 
