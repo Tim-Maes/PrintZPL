@@ -1,19 +1,16 @@
 # PrintZPL
 
 ## Description
-PrintZPL is a lightweight web service to discover Zebra printers via mDNS and send ZPL templates over TCP using simple HTTP calls.
+
+This service allows you to discover Zebra printers and send/print ZPL templates by using HTTP POST requests.
 
 ## Installation
 
-### Pre-reqs
-
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-
 ### Download and run as service
 
-- [PrintZPL-win-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/14935544402/artifacts/3096169978) for Windows
-- [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/14935544402/artifacts/3096169686) for Linux
-- [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/14935544402/artifacts/3096170002) for macOS
+- [PrintZPL-win-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113118) for Windows
+- [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113116) for Linux
+- [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113117) for MaxOS
 
 ## The API
 
@@ -46,7 +43,6 @@ Using these parameters you can send a ZPL template to a printer:
     "Port": "6101"
 }
 ```
-
 ### Print ZPL Label with data
 
 You can also send data parameters to process a template that has placeholders for data and specify a delimiter.
@@ -66,13 +62,12 @@ For example, if you use the `$` delimiter in your ZPL template, you can send the
 }
 ```
 
-`$Greeting]$` and `$Name$` will be replaced by `Hello` and `World` respectively.
+`$Greeting$` and `$Name$` will be replaced by `Hello` and `World` respectively.
 
 ### Print ZPL Labels in batch
 
 Url: `http://localhost:9001/batch-print/from-zpl`
 You can send a batch of ZPL templates to a printer by using the following request:
-
 ```json
 {
     "PrintRequests":
@@ -106,12 +101,15 @@ You can send a batch of ZPL templates to a printer by using the following reques
 ### Building the project
 
 ### Prerequisites
-- .NET 6 SDK
+
+- .NET 8 SDK
+
 ```bash
-dotnet build
+- dotnet build
 ```
 
 ### Running the project
+
 ```bash
 dotnet run
 ```
@@ -123,23 +121,20 @@ This will start a web server on port 9001.
 Run this command in the project folder
 
 **Windows**
-
 ```bash
 dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true --self-contained true
 ```
-
 **Linux** 
 
 ```bash
 dotnet publish -r linux-x64 -c Release /p:PublishSingleFile=true --self-contained true
 ```
-
 **MacOs**
 
 ```bash
 dotnet publish -r osx-x64 -c Release /p:PublishSingleFile=true --self-contained true
 ```
 
-You'll find the output .exe in `bin\Release\net6.0\win-x64\publish`
+You'll find the output .exe in `bin\Release\net8.0\win-x64\publish` (or the corresponding folder for your target platform).
 
 

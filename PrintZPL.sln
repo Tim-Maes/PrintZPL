@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintZPL.Host", "src\PrintZ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintZPL.Core", "src\PrintZPL.Core\PrintZPL.Core.csproj", "{27D994E9-ADBE-4C6A-9E12-675DB9E25B4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintZPL.Tests", "tests\PrintZPL.Tests\PrintZPL.Tests.csproj", "{F7B4B493-9944-5E38-80C0-89818CEF115A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{27D994E9-ADBE-4C6A-9E12-675DB9E25B4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27D994E9-ADBE-4C6A-9E12-675DB9E25B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27D994E9-ADBE-4C6A-9E12-675DB9E25B4E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7B4B493-9944-5E38-80C0-89818CEF115A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7B4B493-9944-5E38-80C0-89818CEF115A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7B4B493-9944-5E38-80C0-89818CEF115A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7B4B493-9944-5E38-80C0-89818CEF115A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -31,7 +31,6 @@ public sealed class PrintService : IPrintService
             template = _templateService.PopulateZplTemplate(data, zplString, delimiter);
         }
 
-        // Ensure ZPL ends with proper line ending for better printer compatibility
         if (!template.EndsWith("\n"))
         {
             template += "\n";
@@ -41,9 +40,8 @@ public sealed class PrintService : IPrintService
         {
             using var client = new TcpClient();
             
-            // Set connection timeout for better Linux compatibility
-            client.ReceiveTimeout = 5000; // 5 seconds
-            client.SendTimeout = 5000;    // 5 seconds
+            client.ReceiveTimeout = 5000;
+            client.SendTimeout = 5000;
             
             _logger.LogDebug("Connecting to printer at {IpAddress}:{Port}", printerIpAddress, port);
             
@@ -53,7 +51,6 @@ public sealed class PrintService : IPrintService
             
             using var stream = client.GetStream();
             
-            // Use explicit UTF-8 encoding and disable auto-flush for better control
             using var writer = new StreamWriter(stream, Encoding.UTF8, bufferSize: 1024, leaveOpen: false)
             {
                 AutoFlush = false
@@ -62,7 +59,6 @@ public sealed class PrintService : IPrintService
             await writer.WriteAsync(template);
             await writer.FlushAsync();
             
-            // Ensure all data is sent over the network
             await stream.FlushAsync();
             
             _logger.LogInformation("ZPL sent to printer successfully. Data length: {Length} characters", template.Length);
