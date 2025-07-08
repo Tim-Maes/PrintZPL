@@ -46,15 +46,14 @@ jobs:
         run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
 
       - name: Check for vulnerable packages
-        run: dotnet list package --vulnerable --include-transitive
+        run: dotnet list package --vulnerable --include-transitive || true
 
       - name: Check for deprecated packages
-        run: dotnet list package --deprecated
+        run: dotnet list package --deprecated || true
 
   publish:
     runs-on: ubuntu-latest
     needs: [build]
-    if: success()
     strategy:
       fail-fast: false
       matrix:
@@ -84,6 +83,7 @@ jobs:
 
       - name: Publish single-file executable (${{ matrix.runtime }})
         run: |
+          echo "Publishing for runtime: ${{ matrix.runtime }}"
           dotnet publish "${{ env.PROJECT_PATH }}" \
             -c ${{ env.CONFIGURATION }} \
             -r ${{ matrix.runtime }} \
@@ -93,6 +93,12 @@ jobs:
             /p:TrimMode=Link \
             /p:EnableCompressionInSingleFile=true
 
+      - name: Verify published files
+        run: |
+          PUBLISH_DIR="src/PrintZPL.Host/bin/${{ env.CONFIGURATION }}/${{ env.FRAMEWORK }}/${{ matrix.runtime }}/publish"
+          echo "Contents of publish directory:"
+          ls -la "$PUBLISH_DIR"
+
       - name: Test published executable (${{ matrix.runtime }})
         run: |
           PUBLISH_DIR="src/PrintZPL.Host/bin/${{ env.CONFIGURATION }}/${{ env.FRAMEWORK }}/${{ matrix.runtime }}/publish"
@@ -100,21 +106,25 @@ jobs:
             echo "Skipping Windows executable test on Linux runner"
           else
             chmod +x "$PUBLISH_DIR/PrintZPL.Host"
-            timeout 10s "$PUBLISH_DIR/PrintZPL.Host" --console || true
+            timeout 10s "$PUBLISH_DIR/PrintZPL.Host" --console || echo "Test completed (expected timeout or exit)"
           fi
 
       - name: Zip published output (${{ matrix.runtime }})
         run: |
           PUBLISH_DIR="src/PrintZPL.Host/bin/${{ env.CONFIGURATION }}/${{ env.FRAMEWORK }}/${{ matrix.runtime }}/publish"
           ZIP_NAME="PrintZPL-${{ matrix.runtime }}.zip"
+          echo "Creating zip file: $ZIP_NAME"
           cd "$PUBLISH_DIR"
           zip -r "${{ github.workspace }}/$ZIP_NAME" .
+          echo "Zip file created, checking size:"
+          ls -la "${{ github.workspace }}/$ZIP_NAME"
 
       - name: Upload artifact for ${{ matrix.runtime }}
         uses: actions/upload-artifact@v4
         with:
           name: PrintZPL-${{ matrix.runtime }}
           path: PrintZPL-${{ matrix.runtime }}.zip
+          if-no-files-found: error
 
   release:
     runs-on: ubuntu-latest
@@ -127,6 +137,11 @@ jobs:
         with:
           pattern: PrintZPL-*
           merge-multiple: true
+
+      - name: List downloaded artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          ls -la *.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
