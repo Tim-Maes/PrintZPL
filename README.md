@@ -12,6 +12,23 @@ This service allows you to discover Zebra printers and send/print ZPL templates 
 - [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113116) for Linux
 - [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/7247084396/artifacts/1121113117) for MaxOS
 
+- ### Running as a Service
+
+1. Create the service:
+
+```powershell
+sc create MyServiceName ^
+    binPath= "C:\Full\Path\To\PrintZpl.exe" ^
+    DisplayName= "PrintZpl" ^
+    start= auto
+```
+
+2. Start the service
+
+```powershell
+sc start PrintZpl
+```
+
 ## The API
 
 ### Discovering printers
