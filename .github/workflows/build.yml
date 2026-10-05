@@ -89,8 +89,6 @@ jobs:
             -r ${{ matrix.runtime }} \
             --self-contained true \
             /p:PublishSingleFile=true \
-            /p:PublishTrimmed=true \
-            /p:TrimMode=Link \
             /p:EnableCompressionInSingleFile=true
 
       - name: Verify published files

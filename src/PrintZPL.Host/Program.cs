@@ -43,6 +43,7 @@ class Program
         IConfiguration configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false)
+            .AddEnvironmentVariables()
             .Build();
 
         return WebHost.CreateDefaultBuilder(args)
@@ -64,8 +65,9 @@ class Program
                      }
                  })
              .UseStartup<Startup>()
-                .UseUrls(configuration.GetValue<string>("Host:Urls"))
-                .UseKestrel()
-                .UseConfiguration(configuration);
+                 .UseUrls(configuration.GetValue<string>("Host:Urls") ?? "http://localhost:9001")
+                 .UseKestrel()
+                 .ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 16 * 1024 * 1024)
+                 .UseConfiguration(configuration);
     }
 }

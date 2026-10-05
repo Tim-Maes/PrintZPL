@@ -2,6 +2,7 @@
 
 public sealed class PrintBatchFromZPLRequest
 {
-    public IEnumerable<PrintFromZPLRequest> PrintRequests { get; set; }
+    [System.ComponentModel.DataAnnotations.MaxLength(50)]
+    public List<PrintFromZPLRequest>? PrintRequests { get; set; }
 
 }

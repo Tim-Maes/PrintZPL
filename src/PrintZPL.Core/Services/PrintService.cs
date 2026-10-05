@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -8,26 +9,38 @@ public sealed class PrintService : IPrintService
 {
     private readonly ILogger<PrintService> _logger;
     private readonly ITemplateService _templateService;
+    private readonly IPrinterAddressPolicy _printerAddressPolicy;
 
     public PrintService(
         ILogger<PrintService> logger,
-        ITemplateService templateService)
+        ITemplateService templateService,
+        IPrinterAddressPolicy printerAddressPolicy)
     {
         _logger = logger;
         _templateService = templateService;
+        _printerAddressPolicy = printerAddressPolicy;
     }
 
-    public async Task PrintZPL(string zplString, string printerIpAddress, int port, Dictionary<string, string> data, string delimiter)
+    public async Task PrintZPL(string zplString, string printerIpAddress, int port, Dictionary<string, string>? data, string delimiter, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Printing ZPL template to {IpAddress}:{Port}", printerIpAddress, port);
 
         if (string.IsNullOrWhiteSpace(zplString))
-            throw new ArgumentNullException(nameof(zplString));
+            throw new ArgumentException("ZPL data is required.", nameof(zplString));
+        if (!IPAddress.TryParse(printerIpAddress, out var printerAddress))
+            throw new ArgumentException("Printer address must be an IP address.", nameof(printerIpAddress));
+        if (!_printerAddressPolicy.IsAllowed(printerAddress))
+            throw new ArgumentException("Printer address is not in the configured allowlist.", nameof(printerIpAddress));
+        if (port is < 1 or > 65535)
+            throw new ArgumentOutOfRangeException(nameof(port), "Printer port must be between 1 and 65535.");
 
         var template = zplString;
 
         if (data is not null && data.Count > 0)
         {
+            if (data.Count > 100 || data.Keys.Any(key => key.Length > 256))
+                throw new ArgumentException("Template data is limited to 100 entries with keys up to 256 characters.", nameof(data));
+
             template = _templateService.PopulateZplTemplate(data, zplString, delimiter);
         }
 
@@ -36,38 +49,44 @@ public sealed class PrintService : IPrintService
             template += "\n";
         }
 
+        if (Encoding.UTF8.GetByteCount(template) > 262144)
+            throw new ArgumentException("ZPL data exceeds the 256 KB limit.", nameof(zplString));
+
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(5));
+
         try
         {
             using var client = new TcpClient();
-            
-            client.ReceiveTimeout = 5000;
-            client.SendTimeout = 5000;
-            
+
             _logger.LogDebug("Connecting to printer at {IpAddress}:{Port}", printerIpAddress, port);
-            
-            await client.ConnectAsync(printerIpAddress, port);
-            
+
+            await client.ConnectAsync(printerIpAddress, port, timeout.Token);
+
             _logger.LogDebug("Connected to printer, sending ZPL data");
-            
+
             using var stream = client.GetStream();
-            
-            using var writer = new StreamWriter(stream, Encoding.UTF8, bufferSize: 1024, leaveOpen: false)
-            {
-                AutoFlush = false
-            };
-            
-            await writer.WriteAsync(template);
-            await writer.FlushAsync();
-            
-            await stream.FlushAsync();
-            
+
+            var bytes = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false).GetBytes(template);
+            await stream.WriteAsync(bytes, timeout.Token);
+            await stream.FlushAsync(timeout.Token);
+
             _logger.LogInformation("ZPL sent to printer successfully. Data length: {Length} characters", template.Length);
+        }
+        catch (OperationCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning(ex, "Timed out while printing to {IpAddress}:{Port}", printerIpAddress, port);
+            throw new TimeoutException("Timed out while communicating with the printer.", ex);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (SocketException ex)
         {
-            _logger.LogError(ex, "Socket error while connecting to printer {IpAddress}:{Port} - {Message}", 
+            _logger.LogError(ex, "Socket error while connecting to printer {IpAddress}:{Port} - {Message}",
                 printerIpAddress, port, ex.Message);
-            throw new InvalidOperationException($"Failed to connect to printer at {printerIpAddress}:{port}", ex);
+            throw new InvalidOperationException("Failed to communicate with the printer.", ex);
         }
         catch (Exception ex)
         {
@@ -79,5 +98,5 @@ public sealed class PrintService : IPrintService
 
 public interface IPrintService
 {
-    Task PrintZPL(string zplString, string printerIpAddress, int port, Dictionary<string, string> data, string delimiter);
+    Task PrintZPL(string zplString, string printerIpAddress, int port, Dictionary<string, string>? data, string delimiter, CancellationToken cancellationToken = default);
 }

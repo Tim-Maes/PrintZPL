@@ -22,22 +22,24 @@ public class BatchPrintController : ControllerBase
 
     [HttpPost]
     [Route("from-zpl")]
-    public async Task<IActionResult> PrintZPL([FromBody] PrintBatchFromZPLRequest batchRequest)
+    public async Task<IActionResult> PrintZPL([FromBody] PrintBatchFromZPLRequest batchRequest, CancellationToken cancellationToken)
     {
         var results = new List<object>();
         var hasErrors = false;
+        var successfulItems = 0;
 
         try
         {
-            _logger.LogInformation("Received batch print request with {Count} items", batchRequest.PrintRequests?.Count() ?? 0);
+            _logger.LogInformation("Received batch print request with {Count} items", batchRequest.PrintRequests?.Count ?? 0);
 
-            if (batchRequest.PrintRequests == null || !batchRequest.PrintRequests.Any())
+            if (batchRequest.PrintRequests == null || batchRequest.PrintRequests.Count == 0 || batchRequest.PrintRequests.Count > 50)
             {
-                return BadRequest(new { success = false, message = "No print requests provided" });
+                return BadRequest(new { success = false, message = "Provide between 1 and 50 print requests." });
             }
 
             foreach (var (request, index) in batchRequest.PrintRequests.Select((r, i) => (r, i)))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
                     _logger.LogDebug("Processing batch item {Index} for {IpAddress}:{Port}", index, request.IpAddress, request.Port);
@@ -47,8 +49,10 @@ public class BatchPrintController : ControllerBase
                         printerIpAddress: request.IpAddress,
                         port: request.Port,
                         data: request.Data,
-                        delimiter: request.Delimiter);
+                        delimiter: request.Delimiter,
+                        cancellationToken: cancellationToken);
 
+                    successfulItems++;
                     results.Add(new { 
                         index = index,
                         success = true, 
@@ -56,15 +60,19 @@ public class BatchPrintController : ControllerBase
                         printer = $"{request.IpAddress}:{request.Port}"
                     });
                 }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     hasErrors = true;
-                    _logger.LogError(ex, "Error processing batch item {Index}: {Message}", index, ex.Message);
+                    _logger.LogError(ex, "Error processing batch item {Index}", index);
                     
                     results.Add(new { 
                         index = index,
                         success = false, 
-                        message = ex.Message,
+                        message = "Print request failed.",
                         printer = $"{request.IpAddress}:{request.Port}"
                     });
                 }
@@ -74,17 +82,21 @@ public class BatchPrintController : ControllerBase
             {
                 success = !hasErrors,
                 totalItems = results.Count,
-                successfulItems = results.Count(r => ((dynamic)r).success),
-                failedItems = results.Count(r => !((dynamic)r).success),
+                successfulItems,
+                failedItems = results.Count - successfulItems,
                 results = results
             };
 
             return hasErrors ? StatusCode(207, response) : Ok(response); // 207 Multi-Status for partial success
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error occurred during batch printing: {Message}", ex.Message);
-            return StatusCode(500, new { success = false, message = "Internal server error", details = ex.Message });
+            _logger.LogError(ex, "Unexpected error occurred during batch printing");
+            return StatusCode(500, new { success = false, message = "Internal server error." });
         }
     }
 }

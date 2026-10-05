@@ -4,6 +4,20 @@
 
 This service allows you to discover Zebra printers and send/print ZPL templates by using HTTP POST requests.
 
+The HTTP API requires an API key. Configure a random secret of at least 32 characters before starting the service. For example, set `Security__ApiKey` in the process environment (Windows PowerShell: `$env:Security__ApiKey = "<random-secret>"`; Linux/macOS: `export Security__ApiKey="<random-secret>"`). Requests must include it in the `X-API-Key` header. The service fails closed with HTTP 503 when no valid key is configured.
+
+Configure `Printers:AllowedAddresses` with the exact printer IP addresses that this service may contact. The list is empty by default, so printing is denied until an allowlist is configured. For example, in `appsettings.json`:
+
+```json
+{
+  "Printers": {
+    "AllowedAddresses": [ "192.168.1.30" ]
+  }
+}
+```
+
+Keep the service on a trusted network, use firewall rules to restrict callers, and do not expose the HTTP endpoint directly to the public internet. Print requests are limited to 256 KB of expanded ZPL; batches accept at most 50 items. Printer connections have a five-second timeout.
+
 ## Installation
 
 ### Download and run as service
@@ -33,7 +47,7 @@ sc start PrintZpl
 
 ### Discovering printers
 
-You can send a GET request to `http//localhost:9001/printers`
+You can send a GET request to `http://localhost:9001/printers` with an `X-API-Key` header.
 Example response:
 
 ```json
@@ -49,17 +63,19 @@ Example response:
 
 ### Print ZPL Labels
 
-You try sending a request to `http://localhost:9001/print/from-zpl`
+Send a POST request to `http://localhost:9001/print/from-zpl` with an `X-API-Key` header.
 
 Using these parameters you can send a ZPL template to a printer:
 
 ```json
 {
     "ZPL": "^XA^FO50,50^ADN,36,20^FDHello, world!!^FS^XZ",
-    "IpAddress": "0.0.0.0.0",
-    "Port": "6101"
+    "IpAddress": "192.168.1.30",
+    "Port": 9100
 }
 ```
+
+The port defaults to `6101` when omitted. Set it explicitly to the printer's raw TCP port (commonly `9100`).
 ### Print ZPL Label with data
 
 You can also send data parameters to process a template that has placeholders for data and specify a delimiter.
@@ -69,8 +85,8 @@ For example, if you use the `$` delimiter in your ZPL template, you can send the
 ```json
 {
     "ZPL": "^XA^FO50,50^ADN,36,20^FD$Greeting$, $Name$!^FS^XZ",
-    "IpAddress": "0.0.0.0.0",
-    "Port": "6101",
+    "IpAddress": "192.168.1.30",
+    "Port": 9100,
     "Data": {
         "Greeting": "Hello",
         "Name": "World"
@@ -83,7 +99,7 @@ For example, if you use the `$` delimiter in your ZPL template, you can send the
 
 ### Print ZPL Labels in batch
 
-Url: `http://localhost:9001/batch-print/from-zpl`
+Url: `http://localhost:9001/batch-print/from-zpl` (include the `X-API-Key` header)
 
 You can send a batch of ZPL templates to a printer by using the following request:
 
@@ -93,8 +109,8 @@ You can send a batch of ZPL templates to a printer by using the following reques
     [
         {
             "ZPL": "^XA^FO50,50^ADN,36,20^FDHello, $Name$!^FS^XZ",
-            "IpAddress": "0.0.0.0.0",
-            "Port": "6101",
+            "IpAddress": "192.168.1.30",
+            "Port": 9100,
             "Data": {
                 "Name": "World",
                 "Name2": "OtherValue"
@@ -103,8 +119,8 @@ You can send a batch of ZPL templates to a printer by using the following reques
         },
         {
             "ZPL": "^XA^FO50,50^ADN,36,20^FDHello, $Name$!^FS^XZ",
-            "IpAddress": "0.0.0.0.0",
-            "Port": "6101",
+            "IpAddress": "192.168.1.30",
+            "Port": 9100,
             "Data": {
                 "Name": "World",
                 "Name2": "OtherValue"

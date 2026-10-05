@@ -17,4 +17,7 @@ public record PrinterInfo(
     string? Model
 );
 
-
+public interface IPrinterAddressPolicy
+{
+    bool IsAllowed(System.Net.IPAddress address);
+}

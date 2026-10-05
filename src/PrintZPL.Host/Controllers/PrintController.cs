@@ -22,7 +22,7 @@ public class PrintController : ControllerBase
 
     [HttpPost]
     [Route("from-zpl")]
-    public async Task<IActionResult> PrintZPL([FromBody] PrintFromZPLRequest request)
+    public async Task<IActionResult> PrintZPL([FromBody] PrintFromZPLRequest request, CancellationToken cancellationToken)
     {
         try
         {
@@ -33,24 +33,29 @@ public class PrintController : ControllerBase
                 printerIpAddress: request.IpAddress,
                 port: request.Port,
                 data: request.Data,
-                delimiter: request.Delimiter);
+                delimiter: request.Delimiter,
+                cancellationToken: cancellationToken);
 
             return Ok(new { success = true, message = "ZPL sent to printer successfully" });
         }
-        catch (ArgumentNullException ex)
+        catch (ArgumentException ex)
         {
             _logger.LogWarning("Invalid request: {Message}", ex.Message);
-            return BadRequest(new { success = false, message = "Invalid ZPL data provided" });
+            return BadRequest(new { success = false, message = "Invalid print request." });
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex) when (ex is InvalidOperationException or TimeoutException)
         {
-            _logger.LogError(ex, "Printer connection failed: {Message}", ex.Message);
-            return StatusCode(502, new { success = false, message = "Failed to connect to printer", details = ex.Message });
+            _logger.LogError(ex, "Printer communication failed");
+            return StatusCode(502, new { success = false, message = "Failed to communicate with printer." });
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error occurred while printing ZPL: {Message}", ex.Message);
-            return StatusCode(500, new { success = false, message = "Internal server error", details = ex.Message });
+            return StatusCode(500, new { success = false, message = "Internal server error." });
         }
     }
 }
