@@ -22,9 +22,9 @@ Keep the service on a trusted network, use firewall rules to restrict callers, a
 
 ### Download and run as service
 
-- [PrintZPL-win-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/16136982808/artifacts/3483652427) for Windows
-- [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/16136982808/artifacts/3483652362) for Linux
-- [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/16136982808/artifacts/3483652701) for MaxOS
+- [PrintZPL-win-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/37311999616/artifacts/11346177294) for Windows
+- [PrintZPL-linux-x64](https://github.com/Tim-Maes/PrintZPL/actions/runs/37311999616/artifacts/11346741178) for Linux
+- [PrintZPL-osx-x65](https://github.com/Tim-Maes/PrintZPL/actions/runs/37311999616/artifacts/11346202331) for MaxOS
 
 ### Running as a Service
 
